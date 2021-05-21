@@ -1,10 +1,29 @@
 import React from 'react';
-import { Container, Typography, TextField, Button } from '@material-ui/core/';
+import { Container, Typography, TextField, Button, Grid } from '@material-ui/core/';
 
 
 const Form = (props) => {
-    const { name, score, subject } = props
 
+    // const { name, score, subject } = props
+   const handleChange = event => {
+        this.setState({ [event.target.name]: event.target.value })
+    
+      }
+     const handleSubmit = event => {
+        event.preventDefault();
+        const { data, name, subject, score } = this.state
+        let arr = data
+        const currentIndex = data.findIndex(d => name === d.name && subject === d.subject)
+        if (currentIndex === -1) {
+          arr.push({ id: arr.length + 1, name, subject, score })
+    
+        }
+        else {
+          arr[currentIndex] = { ...arr[currentIndex], score: parseInt(arr[currentIndex].score, 10) + parseInt(score, 10) }
+        }
+        this.setState({ data: arr })
+    
+      }
 
 
     const mystyle = {
@@ -13,49 +32,13 @@ const Form = (props) => {
     }
 
     return (
-
-        <React.Fragment>
-
-            <Container maxWidth="sm">
-                <Typography align="center" variant="h6" gutterBottom>
-                    Fill users details
+        <Container maxWidth="sm">
+            <Typography align="center" variant="h6" gutterBottom>
+                Fill users details
                     </Typography>
 
-                <form onSubmit={props.onSubmit} autoComplete="off">
-                    <TextField
-                        required
-                        style={mystyle}
-                        id="user"
-                        label="Name:"
-                        variant="outlined"
-                        name="name"
-                        value={name || ""}
-                        onChange={props.onChange} /><br />
-                    <TextField
-                        required
-                        style={mystyle}
-                        id="subject"
-                        label="Subject:"
-                        variant="outlined"
-                        name="subject"
-                        value={subject || ""}
-                        onChange={props.onChange} /><br />
-                    <TextField
-                        required
-                        style={mystyle}
-                        type="number"
-                        id="score"
-                        label="Score:"
-                        variant="outlined"
-                        name="score"
-                        value={score || ""}
-                        onChange={props.onChange} /><br />
-                    <div style={{ textAlign: "center" }}><Button type="submit" variant="contained" color="primary">
-                        Submit
-                        </Button></div>
-                </form>
-            </Container>
-        </React.Fragment>
+            
+        </Container>
     );
 
 }

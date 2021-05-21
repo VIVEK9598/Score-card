@@ -1,63 +1,107 @@
-import React, { Component } from 'react';
-import Form from './Form';
+import React, { useState } from 'react';
+import { Formik, Form } from 'formik';
+import { Container, Grid, Typography, TextField, Button, Box } from '@material-ui/core/';
+
 import TablList from './Table_List';
-import { Container, Grid, Typography } from '@material-ui/core/';
+import { formSchema } from './formSchema'
 
-
-class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      data: []
-    }
+const App = () => {
+  const [data, setData] = useState([])
+  const mystyle = {
+    margin: '5px'
   }
+  return (
+    <div>
+      <Container maxWidth="sm">
+        <Grid container spacing={3}>
+          <Formik
+            initialValues={{ name: '', score: '', subject: '' }}
+            validationSchema={formSchema}
+            onSubmit={(values, { setSubmitting }) => {
+              let arr = []
+              const currentIndex = data.findIndex(d => values.name === d.name && values.subject === d.subject)
+              if (currentIndex === -1) {
+                arr.push({ id: data.length + 1, name: values.name, subject: values.subject, score: values.score })
+              }
+              else {
+                arr[currentIndex] = { ...data[currentIndex], score: parseInt(data[currentIndex].score, 10) + parseInt(values.score, 10) }
+              }
+              setData(arr)
+            }}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting,
+            }) => (
+              <Grid item md={6} xs={12}>
+                <Form onSubmit={handleSubmit} autoComplete="off" noValidate>
+                  <TextField
+                    required
+                    style={mystyle}
+                    id="user"
+                    label="Name:"
+                    variant="outlined"
+                    name="name"
+                    value={values.name || ""}
+                    onChange={handleChange}
+                    error={touched.name && errors.name}
+                    errorText={errors.name} />
+                  {touched.name && errors.name && <div><Box color="error.main">{errors.name}</Box></div>}
+                  <br />
+                  <TextField
+                    required
+                    style={mystyle}
+                    id="subject"
+                    label="Subject:"
+                    variant="outlined"
+                    name="subject"
+                    value={values.subject || ""}
+                    onChange={handleChange}
+                    error={touched.subject && errors.subject}
+                    errorText={errors.subject}
+                  />
+                  {touched.subject && errors.subject && <div><Box color="error.main">{errors.subject}</Box></div>}
+                  <br />
+                  <TextField
+                    required
+                    style={mystyle}
+                    type="number"
+                    id="score"
+                    label="Score:"
+                    variant="outlined"
+                    name="score"
+                    value={values.score || ""}
+                    onChange={handleChange}
+                    error={touched.score && errors.score}
+                    errorText={errors.score} />
+                  {touched.score && errors.score && <div><Box color="error.main">{errors.score}</Box></div>}
+                  <br />
+                  <div style={{ textAlign: "center" }}>
+                    <Button type="submit" variant="contained" color="primary">
+                      Submit
+                    </Button>
+                  </div>
+                </Form>
+              </Grid>
 
+            )}
+          </Formik>
 
-  handleChange = event => {
-    this.setState({ [event.target.name]: event.target.value })
-
-  }
-  handleSubmit = event => {
-    event.preventDefault();
-    const { data, name, subject, score } = this.state
-    let arr = data
-    const currentIndex = data.findIndex(d => name === d.name && subject === d.subject)
-    if (currentIndex === -1) {
-      arr.push({ id: arr.length + 1, name, subject, score })
-
-    }
-    else {
-      arr[currentIndex] = { ...arr[currentIndex], score: parseInt(arr[currentIndex].score, 10) + parseInt(score, 10) }
-    }
-    this.setState({ data: arr })
-
-  }
-  render() {
-    const { name, data, score, subject } = this.state
-    return (
-
-      <div className="App">
-        <Container maxWidth="sm">
-          <Grid container spacing={3}>
-            <Grid item md={6} xs={12}>
-              <Form
-                name={name}
-                score={score}
-                subject={subject}
-                onChange={this.handleChange}
-                onSubmit={this.handleSubmit}
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              {data.length === 0 ? <Typography align="center" variant="h5">Data not available</Typography> : <TablList data={data} />}
-
-
-            </Grid>
+          <Grid item md={6} xs={12}>
+            {
+              data.length === 0 ? <Typography align="center" variant="h5">Data not available</Typography>
+                : <TablList data={data} />
+            }
           </Grid>
-        </Container>
-      </div>
-    );
-  }
+        </Grid>
+      </Container>
+    </div>
+  );
 }
 
 export default App;
